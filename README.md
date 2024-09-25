@@ -10,7 +10,12 @@ The smaller games of tic tac toe are evaluated as a normal game of tic tac toe. 
 
 ## How Each Technology Will Be Used
 ### HTML
-Basic structure of the website
+for this Project I made 4 html pages, 
+1 for the home page and login called index.html
+2 for Websocket where the players can play the game against each other called play.html
+3 for a database display of highscores called scores.html
+4 for an explination page with fun quotes added from a 3rd party api called about.html
+
 ### CSS
 Small animations within the game and improved styling of the webpage. 
 ### JavaScript
