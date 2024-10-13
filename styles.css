@@ -1,0 +1,64 @@
+:root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --accent-color: #e74c3c;
+  }
+  
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+  
+  .navbar {
+    background-color: var(--secondary-color);
+  }
+  
+  .navbar-dark .navbar-nav .nav-link {
+    color: var(--text-color);
+  }
+  
+  .navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--primary-color);
+  }
+  
+  h1, h2 {
+    color: var(--primary-color);
+  }
+  
+  .card {
+    background-color: var(--secondary-color);
+    border: none;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+  }
+  
+  .form-control {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--text-color);
+  }
+  
+  .form-control:focus {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+  }
+  
+  footer {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    padding: 10px 0;
+  }
+  
+  /* Add more custom styles as needed */
