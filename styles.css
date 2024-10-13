@@ -1,64 +1,134 @@
 :root {
-    --bg-color: #1a1a1a;
-    --text-color: #e0e0e0;
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
-    --accent-color: #e74c3c;
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --accent-color: #e74c3c;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+  padding: 20px;
+}
+
+/* Navigation */
+nav {
+  background-color: var(--secondary-color);
+  padding: 10px 0;
+}
+
+nav a {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 5px 10px;
+  margin: 0 5px;
+}
+
+nav a:hover {
+  color: var(--primary-color);
+}
+
+/* Headings */
+h1, h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+/* Cards */
+.card {
+  background-color: var(--secondary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+/* Forms */
+.form-control {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border-color: var(--text-color);
+}
+
+.form-control:focus {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Scores */
+.score-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.score-item {
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.score-item:nth-child(1) {
+  background-color: #ffd700;
+  color: var(--bg-color);
+}
+
+.score-item:nth-child(2) {
+  background-color: #c0c0c0;
+  color: var(--bg-color);
+}
+
+.score-item:nth-child(3) {
+  background-color: #cd7f32;
+  color: var(--bg-color);
+}
+
+/* Footer */
+footer {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  text-align: center;
+  padding: 10px 0;
+  margin-top: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    align-items: center;
   }
-  
-  body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+
+  nav a {
+    margin: 5px 0;
   }
-  
-  .navbar {
-    background-color: var(--secondary-color);
-  }
-  
-  .navbar-dark .navbar-nav .nav-link {
-    color: var(--text-color);
-  }
-  
-  .navbar-dark .navbar-nav .nav-link:hover {
-    color: var(--primary-color);
-  }
-  
-  h1, h2 {
-    color: var(--primary-color);
-  }
-  
-  .card {
-    background-color: var(--secondary-color);
-    border: none;
-  }
-  
-  .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-  }
-  
-  .btn-primary:hover {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-  }
-  
-  .form-control {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border-color: var(--text-color);
-  }
-  
-  .form-control:focus {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-  }
-  
-  footer {
-    background-color: var(--secondary-color);
-    color: var(--text-color);
-    padding: 10px 0;
-  }
-  
-  /* Add more custom styles as needed */
+}
