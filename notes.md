@@ -21,6 +21,81 @@ ssh -i production.pem ubuntu@34.194.100.178
 Perms restriction
 chmod  600 production.pem
 
+
+## React stuff
+import React from "https://cdn.skypack.dev/react";
+import ReactDOM from "https://cdn.skypack.dev/react-dom";
+
+import {
+  BrowserRouter,
+  NavLink,
+  Routes,
+  Navigate,
+  Route
+} from "https://cdn.skypack.dev/react-router-dom";
+
+function Home() {
+  return <div className="home comp">Home</div>;
+}
+
+function About() {
+  return <div className="about comp">About</div>;
+}
+
+function Users() {
+  return <div className="users comp">Users</div>;
+}
+
+function Scores() {
+  return <div className="scores comp">Scores</div>;
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="app">
+        <nav>
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/users">Users</NavLink>
+          <NavLink to="/about">About</NavLink>
+          <NavLink to="/scores">Scores</NavLink>
+        </nav>
+
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} exact />
+            <Route path="/about" element={<About />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/scores" element={<Scores />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+
+        <footer>Footer</footer>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### HTML and CSS Questions:
 
 1. **Link Element (`<link>`):**
