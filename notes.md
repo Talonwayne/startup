@@ -1,3 +1,11 @@
+# CSS update
+
+Here I have made spereate Css files, a colapasble button, flexable page design and lots of placeholders for websocket and other applications. I started with individual css files but ended up using one master one. 
+
+
+
+
+
 # Class notes
 Markdown information
 Headings use "#"
