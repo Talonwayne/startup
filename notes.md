@@ -3,6 +3,9 @@
 Here I have made spereate Css files, a colapasble button, flexable page design and lots of placeholders for websocket and other applications. I started with individual css files but ended up using one master one. 
 
 
+I chose darker colors and managed the images I placed to make the website look good. 
+
+
 
 
 
