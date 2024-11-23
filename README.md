@@ -1,8 +1,39 @@
-# React + Vite
+# Ultimate Tic Tac Toe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Explination
+This Project will make a simple game called Ultimate Tic Tac Toe.
+This is where 2 players will dynamically play 9 games of Tic Tac Toe at the same time, that come together to make one big game of tic tac toe. If one player wins a smaller game of tic tac toe, then their symbol takes over that grid in the larger game of tic tac toe. Whoever win the large game of tic tac toe wins the game. 
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Key Features
+The smaller games of tic tac toe are evaluated as a normal game of tic tac toe. If one team moves in the top corner on the small game then the other team must play in the top corner game if possible. The program will have a server that sends data to each of the players who login on the website. They will play games and have a simple history of the games stored. This history will then be used to calculate a player score like elo.
+
+## How Each Technology Will Be Used
+### HTML
+for this Project I made 4 html pages, 
+
+1 for the home page and login called index.html
+
+2 for Websocket where the players can play the game against each other called play.html
+
+3 for a database display of highscores called scores.html
+
+4 for an explination page with fun quotes added from a 3rd party api called about.html
+
+## CSS
+Small animations within the game and improved styling of the webpage. 
+
+I made a file for each page and then realised it would be better to just do one css file. 
+### JavaScript
+How the users will interact with the game and call the code to run the game. 
+### Webservice
+The simple code to run the logic of the game and share the information between the people who are playing the game. 
+### Authentication
+How the players will login and the tags to keep the results of the matches. 
+### Database data
+Where the match history will be stored.
+### WebSocket data
+All of the data given from the server to the user.
+
+## Sketch
+ ![cover](https://github.com/Talonwayne/startup/blob/main/Sketch.png)
