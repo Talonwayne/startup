@@ -1,144 +1,183 @@
 import { useState } from "react";
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, isHighlighted }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button 
+      className={`square ${isHighlighted ? 'highlighted' : ''}`} 
+      onClick={onSquareClick}
+    >
       {value}
     </button>
   );
 }
 
-function Board({ xIsUp, squares, onPlay }) {
-  function isBoardFull(squares) {
-    return squares.every(square => square !== null);
-  }
+function SubBoard({ board, mainRow, mainCol, onPlay, isPlayable, currentTarget }) {
+  const renderSquare = (subRow, subCol) => {
+    const isHighlighted = currentTarget && 
+      mainRow === currentTarget[0] && 
+      mainCol === currentTarget[1];
 
-  function handleClick(i) {
-    if (squares[i] || calculateWinner(squares)) {
-      return;
-    }
-    const nextSquares = squares.slice();
-    nextSquares[i] = xIsUp ? "X" : "O";
-    
-    if (isBoardFull(nextSquares) && !calculateWinner(nextSquares)) {
-      onPlay(nextSquares, true);
-      return;
-    }
-    
-    onPlay(nextSquares);
-  }
-
-  const winner = calculateWinner(squares);
-  let status;
-  if (winner) {
-    status = "Winner: " + winner;
-  } else if (isBoardFull(squares)) {
-    status = "Game is a draw!";
-  } else {
-    status = "Next player: " + (xIsUp ? "X" : "O");
-  }
+    return (
+      <Square
+        value={board[subRow][subCol]}
+        isHighlighted={isHighlighted}
+        onSquareClick={() => isPlayable && onPlay(mainRow, mainCol, subRow, subCol)}
+      />
+    );
+  };
 
   return (
-    <>
-      <div className="status">{status}</div>
+    <div className="sub-board">
       <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
+        {renderSquare(0, 0)}
+        {renderSquare(0, 1)}
+        {renderSquare(0, 2)}
       </div>
       <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
+        {renderSquare(1, 0)}
+        {renderSquare(1, 1)}
+        {renderSquare(1, 2)}
       </div>
       <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+        {renderSquare(2, 0)}
+        {renderSquare(2, 1)}
+        {renderSquare(2, 2)}
       </div>
-    </>
+    </div>
   );
 }
 
-function calculateWinner(squares) {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
+function Board({ xIsUp, board, mainBoard, onPlay, targetBoard }) {
+  const isSubBoardPlayable = (row, col) => {
+    return !targetBoard || (targetBoard[0] === row && targetBoard[1] === col);
+  };
+
+  return (
+    <div className="main-board">
+      {[0, 1, 2].map(row => (
+        <div key={row} className="main-board-row">
+          {[0, 1, 2].map(col => (
+            <div key={col} className={`sub-board-wrapper ${mainBoard[row][col] ? 'won-' + mainBoard[row][col] : ''}`}>
+              <SubBoard
+                board={board[row][col]}
+                mainRow={row}
+                mainCol={col}
+                onPlay={onPlay}
+                isPlayable={isSubBoardPlayable(row, col) && mainBoard[row][col] === " "}
+                currentTarget={targetBoard}
+              />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export default function Game() {
-  const [history, setHistory] = useState([Array(9).fill(null)]);
-  const [currentMove, setCurrentMove] = useState(0);
-  const currentSquares = history[currentMove];
-  const xIsUp = currentMove % 2 === 0;
+  const createEmptyBoard = () => Array(3).fill(null)
+    .map(() => Array(3).fill(null)
+      .map(() => Array(3).fill(null)
+        .map(() => Array(3).fill(null))));
+
+  const createEmptyMainBoard = () => Array(3).fill(null)
+    .map(() => Array(3).fill(" "));
+
+  const [board, setBoard] = useState(createEmptyBoard());
+  const [mainBoard, setMainBoard] = useState(createEmptyMainBoard());
+  const [xIsNext, setXIsNext] = useState(true);
+  const [targetBoard, setTargetBoard] = useState(null);
   const [scores, setScores] = useState({ X: 0, O: 0 });
 
-  function handlePlay(nextSquares, isDraw) {
-    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
-    setHistory(nextHistory);
-    setCurrentMove(nextHistory.length - 1);
+  function calculateWinner(board) {
+    const lines = [
+      [[0,0], [0,1], [0,2]],
+      [[1,0], [1,1], [1,2]],
+      [[2,0], [2,1], [2,2]],
+      [[0,0], [1,0], [2,0]],
+      [[0,1], [1,1], [2,1]],
+      [[0,2], [1,2], [2,2]],
+      [[0,0], [1,1], [2,2]],
+      [[0,2], [1,1], [2,0]]
+    ];
+
+    for (const line of lines) {
+      const [[a1, a2], [b1, b2], [c1, c2]] = line;
+      if (board[a1][a2] !== " " && 
+          board[a1][a2] !== "D" &&
+          board[a1][a2] === board[b1][b2] && 
+          board[a1][a2] === board[c1][c2]) {
+        return board[a1][a2];
+      }
+    }
+    return null;
+  }
+
+  function isBoardFull(board) {
+    return board.every(row => 
+      row.every(cell => cell !== null && cell !== " ")
+    );
+  }
+
+  function handlePlay(mainRow, mainCol, subRow, subCol) {
+    const newBoard = JSON.parse(JSON.stringify(board));
+    const currentPlayer = xIsNext ? "X" : "O";
+
+    // Make the move
+    newBoard[mainRow][mainCol][subRow][subCol] = currentPlayer;
     
-    const winner = calculateWinner(nextSquares);
+    // Check if sub-board is won or drawn
+    const subBoardArray = board[mainRow][mainCol].map(row => row.slice());
+    if (calculateWinner(subBoardArray)) {
+      mainBoard[mainRow][mainCol] = currentPlayer;
+    } else if (isBoardFull(subBoardArray)) {
+      mainBoard[mainRow][mainCol] = "D";
+    }
+
+    // Check if game is won
+    const winner = calculateWinner(mainBoard);
     if (winner) {
       setScores(prev => ({
         ...prev,
         [winner]: prev[winner] + 1
       }));
+      resetGame();
+      return;
     }
-  }
 
-  function jumpTo(nextMove) {
-    setCurrentMove(nextMove);
+    // Set next target board
+    const nextTarget = mainBoard[subRow][subCol] === " " ? [subRow, subCol] : null;
+    
+    setBoard(newBoard);
+    setTargetBoard(nextTarget);
+    setXIsNext(!xIsNext);
   }
 
   function resetGame() {
-    setHistory([Array(9).fill(null)]);
-    setCurrentMove(0);
+    setBoard(createEmptyBoard());
+    setMainBoard(createEmptyMainBoard());
+    setXIsNext(true);
+    setTargetBoard(null);
   }
-
-  const scoreBoard = (
-    <div className="score-board">
-      <div>X Score: {scores.X}</div>
-      <div>O Score: {scores.O}</div>
-    </div>
-  );
-
-  const moves = history.map((squares, move) => {
-    let description;
-    if (move > 0) {
-      description = "Go to move #" + move;
-    } else {
-      description = "Go to game start";
-    }
-    return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
-      </li>
-    );
-  });
 
   return (
     <div className="game">
-      {scoreBoard}
+      <div className="score-board">
+        <div>X Score: {scores.X}</div>
+        <div>O Score: {scores.O}</div>
+      </div>
       <div className="game-board">
-        <Board xIsUp={xIsUp} squares={currentSquares} onPlay={handlePlay} />
+        <Board
+          xIsUp={xIsNext}
+          board={board}
+          mainBoard={mainBoard}
+          onPlay={handlePlay}
+          targetBoard={targetBoard}
+        />
       </div>
       <div className="game-info">
-        <ol>{moves}</ol>
+        <div>Current Player: {xIsNext ? 'X' : 'O'}</div>
+        <button onClick={resetGame}>Reset Game</button>
       </div>
     </div>
   );

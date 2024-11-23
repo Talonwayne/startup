@@ -1,0 +1,53 @@
+.main-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: #333;
+    padding: 8px;
+  }
+  
+  .sub-board-wrapper {
+    background: #fff;
+    padding: 4px;
+  }
+  
+  .sub-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  
+  .square {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #999;
+    background: #fff;
+  }
+  
+  .highlighted {
+    background: #ffeb3b;
+  }
+  
+  .won-X {
+    background: rgba(255, 0, 0, 0.2);
+  }
+  
+  .won-O {
+    background: rgba(0, 0, 255, 0.2);
+  }
+  
+  .won-D {
+    background: rgba(128, 128, 128, 0.2);
+  }
+  
+  .score-board {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  
+  .game-info {
+    margin-top: 20px;
+    text-align: center;
+  }
