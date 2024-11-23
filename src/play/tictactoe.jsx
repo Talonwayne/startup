@@ -9,16 +9,22 @@ function Square({ value, onSquareClick }) {
 }
 
 function Board({ xIsUp, squares, onPlay }) {
+  function isBoardFull(squares) {
+    return squares.every(square => square !== null);
+  }
+
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return;
     }
     const nextSquares = squares.slice();
-    if (xIsUp) {
-      nextSquares[i] = "X";
-    } else {
-      nextSquares[i] = "O";
+    nextSquares[i] = xIsUp ? "X" : "O";
+    
+    if (isBoardFull(nextSquares) && !calculateWinner(nextSquares)) {
+      onPlay(nextSquares, true);
+      return;
     }
+    
     onPlay(nextSquares);
   }
 
@@ -26,6 +32,8 @@ function Board({ xIsUp, squares, onPlay }) {
   let status;
   if (winner) {
     status = "Winner: " + winner;
+  } else if (isBoardFull(squares)) {
+    status = "Game is a draw!";
   } else {
     status = "Next player: " + (xIsUp ? "X" : "O");
   }
@@ -77,16 +85,37 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const currentSquares = history[currentMove];
   const xIsUp = currentMove % 2 === 0;
+  const [scores, setScores] = useState({ X: 0, O: 0 });
 
-  function handlePlay(nextSquares) {
+  function handlePlay(nextSquares, isDraw) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    
+    const winner = calculateWinner(nextSquares);
+    if (winner) {
+      setScores(prev => ({
+        ...prev,
+        [winner]: prev[winner] + 1
+      }));
+    }
   }
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
+
+  function resetGame() {
+    setHistory([Array(9).fill(null)]);
+    setCurrentMove(0);
+  }
+
+  const scoreBoard = (
+    <div className="score-board">
+      <div>X Score: {scores.X}</div>
+      <div>O Score: {scores.O}</div>
+    </div>
+  );
 
   const moves = history.map((squares, move) => {
     let description;
@@ -104,6 +133,7 @@ export default function Game() {
 
   return (
     <div className="game">
+      {scoreBoard}
       <div className="game-board">
         <Board xIsUp={xIsUp} squares={currentSquares} onPlay={handlePlay} />
       </div>
