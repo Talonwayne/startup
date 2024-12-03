@@ -1,14 +1,3 @@
-td {
-  max-width: 40vw;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-body {
-    background-color: #f8f9fa;
-    font-family: Arial, sans-serif;
-}
 
 .container {
     max-width: 800px;
@@ -20,18 +9,6 @@ h1 {
     color: #ffffff;
     margin-bottom: 30px;
     text-align: center;
-}
-
-nav a {
-    color: #ffffff;
-    text-decoration: none;
-    margin: 0 15px;
-    font-weight: bold;
-}
-
-.score-list {
-    list-style-type: none;
-    padding: 0;
 }
 
 .score-item {
@@ -56,8 +33,10 @@ nav a {
     background-color: #cd7f32;
 }
 
-footer {
-    margin-top: 30px;
-    text-align: right;
-    color: #6c757d;
+.score-item:nth-child(4) {
+  background-color: #91bbad6c;
+}
+
+.score-item:nth-child(5) {
+  background-color: #91bbad6c;
 }
