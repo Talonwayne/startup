@@ -1,0 +1,249 @@
+import React, { useEffect, useRef, useState } from 'react';
+
+const SCREEN_WIDTH = 900;
+const SCREEN_HEIGHT = 900;
+const LINE_WIDTH = 5;
+const BOARD_ROWS = 9;
+const BOARD_COLS = 9;
+const SQUARE_SIZE = SCREEN_WIDTH / BOARD_COLS;
+const CIRCLE_RADIUS = SQUARE_SIZE / 3;
+const CIRCLE_WIDTH = 15;
+const CROSS_WIDTH = 25;
+const SPACE = SQUARE_SIZE / 4;
+const LARGE_SYMBOL_WIDTH = 50;
+const LARGE_SYMBOL_SPACE = 75;
+
+// Colors
+const BG_COLOR = '#1CA89C';
+const LINE_COLOR = '#179189';
+const CIRCLE_COLOR = '#EFE7C8';
+const CROSS_COLOR = '#545454';
+const DRAW_COLOR = '#0000FF'; // Blue box for draw
+const HIGHLIGHT_COLOR = '#FFFF00';
+
+const UltimateTicTacToe = () => {
+    const canvasRef = useRef(null);
+    const [board, setBoard] = useState(Array(3).fill().map(() => Array(3).fill().map(() => Array(3).fill().map(() => Array(3).fill(null)))));
+    const [mainBoard, setMainBoard] = useState(Array(3).fill().map(() => Array(3).fill(" ")));
+    const [currentPlayer, setCurrentPlayer] = useState("X");
+    const [targetBoard, setTargetBoard] = useState(null);
+    const [scoreboard, setScoreboard] = useState({ X: 0, O: 0 });
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        resetGame(context);
+    }, []);
+
+    const resetGame = (context) => {
+        setBoard(Array(3).fill().map(() => Array(3).fill().map(() => Array(3).fill().map(() => Array(3).fill(null)))));
+        setMainBoard(Array(3).fill().map(() => Array(3).fill(" ")));
+        setCurrentPlayer("X");
+        setTargetBoard(null);
+        context.fillStyle = BG_COLOR;
+        context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        drawLines(context);
+        drawScoreboard(context);
+    };
+
+    const drawLines = (context) => {
+        context.strokeStyle = LINE_COLOR;
+        context.lineWidth = LINE_WIDTH;
+
+        // Horizontal and Vertical lines
+        for (let row = 1; row < BOARD_ROWS; row++) {
+            context.beginPath();
+            context.moveTo(0, row * SQUARE_SIZE);
+            context.lineTo(SCREEN_WIDTH, row * SQUARE_SIZE);
+            context.stroke();
+        }
+        for (let col = 1; col < BOARD_COLS; col++) {
+            context.beginPath();
+            context.moveTo(col * SQUARE_SIZE, 0);
+            context.lineTo(col * SQUARE_SIZE, SCREEN_HEIGHT);
+            context.stroke();
+        }
+
+        // Main board lines
+        for (let row = 1; row < 3; row++) {
+            context.beginPath();
+            context.moveTo(0, row * 3 * SQUARE_SIZE);
+            context.lineTo(SCREEN_WIDTH, row * 3 * SQUARE_SIZE);
+            context.lineWidth = LINE_WIDTH * 2;
+            context.stroke();
+        }
+        for (let col = 1; col < 3; col++) {
+            context.beginPath();
+            context.moveTo(col * 3 * SQUARE_SIZE, 0);
+            context.lineTo(col * 3 * SQUARE_SIZE, SCREEN_HEIGHT);
+            context.lineWidth = LINE_WIDTH * 2;
+            context.stroke();
+        }
+    };
+
+    const drawFigures = (context) => {
+        for (let mainRow = 0; mainRow < 3; mainRow++) {
+            for (let mainCol = 0; mainCol < 3; mainCol++) {
+                if (mainBoard[mainRow][mainCol] === 'X' || mainBoard[mainRow][mainCol] === 'O' || mainBoard[mainRow][mainCol] === 'D') {
+                    drawLargeSymbol(context, mainRow, mainCol, mainBoard[mainRow][mainCol]);
+                } else {
+                    for (let subRow = 0; subRow < 3; subRow++) {
+                        for (let subCol = 0; subCol < 3; subCol++) {
+                            if (board[mainRow][mainCol][subRow][subCol] === 'X') {
+                                drawCross(context, mainRow, mainCol, subRow, subCol);
+                            } else if (board[mainRow][mainCol][subRow][subCol] === 'O') {
+                                drawCircle(context, mainRow, mainCol, subRow, subCol);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    const drawCircle = (context, mainRow, mainCol, subRow, subCol) => {
+        context.beginPath();
+        context.arc(mainCol * 3 * SQUARE_SIZE + subCol * SQUARE_SIZE + SQUARE_SIZE / 2,
+                    mainRow * 3 * SQUARE_SIZE + subRow * SQUARE_SIZE + SQUARE_SIZE / 2,
+                    CIRCLE_RADIUS, 0, Math.PI * 2);
+        context.lineWidth = CIRCLE_WIDTH;
+        context.strokeStyle = CIRCLE_COLOR;
+        context.stroke();
+    };
+
+    const drawCross = (context, mainRow, mainCol, subRow, subCol) => {
+        context.strokeStyle = CROSS_COLOR;
+        context.lineWidth = CROSS_WIDTH;
+        context.beginPath();
+        context.moveTo(mainCol * 3 * SQUARE_SIZE + subCol * SQUARE_SIZE + SPACE,
+                       mainRow * 3 * SQUARE_SIZE + subRow * SQUARE_SIZE + SQUARE_SIZE - SPACE);
+        context.lineTo(mainCol * 3 * SQUARE_SIZE + subCol * SQUARE_SIZE + SQUARE_SIZE - SPACE,
+                       mainRow * 3 * SQUARE_SIZE + subRow * SQUARE_SIZE + SPACE);
+        context.stroke();
+        context.beginPath();
+        context.moveTo(mainCol * 3 * SQUARE_SIZE + subCol * SQUARE_SIZE + SPACE,
+                       mainRow * 3 * SQUARE_SIZE + subRow * SQUARE_SIZE + SPACE);
+        context.lineTo(mainCol * 3 * SQUARE_SIZE + subCol * SQUARE_SIZE + SQUARE_SIZE - SPACE,
+                       mainRow * 3 * SQUARE_SIZE + subRow * SQUARE_SIZE + SQUARE_SIZE - SPACE);
+        context.stroke();
+    };
+
+    const drawLargeSymbol = (context, mainRow, mainCol, symbol) => {
+        const centerX = mainCol * 3 * SQUARE_SIZE + 1.5 * SQUARE_SIZE;
+        const centerY = mainRow * 3 * SQUARE_SIZE + 1.5 * SQUARE_SIZE;
+        if (symbol === 'X') {
+            context.strokeStyle = CROSS_COLOR;
+            context.lineWidth = LARGE_SYMBOL_WIDTH;
+            context.beginPath();
+            context.moveTo(centerX - LARGE_SYMBOL_SPACE, centerY - LARGE_SYMBOL_SPACE);
+            context.lineTo(centerX + LARGE_SYMBOL_SPACE, centerY + LARGE_SYMBOL_SPACE);
+            context.stroke();
+            context.beginPath();
+            context.moveTo(centerX - LARGE_SYMBOL_SPACE, centerY + LARGE_SYMBOL_SPACE);
+            context.lineTo(centerX + LARGE_SYMBOL_SPACE, centerY - LARGE_SYMBOL_SPACE);
+            context.stroke();
+        } else if (symbol === 'O') {
+            context.strokeStyle = CIRCLE_COLOR;
+            context.lineWidth = LARGE_SYMBOL_WIDTH;
+            context.beginPath();
+            context.arc(centerX, centerY, SQUARE_SIZE, 0, Math.PI * 2);
+            context.stroke();
+        } else if (symbol === 'D') {
+            context.fillStyle = DRAW_COLOR;
+            context.fillRect(mainCol * 3 * SQUARE_SIZE, mainRow * 3 * SQUARE_SIZE, 3 * SQUARE_SIZE, 3 * SQUARE_SIZE);
+        }
+    };
+
+    const drawScoreboard = (context) => {
+        context.fillStyle = CROSS_COLOR;
+        context.font = '74px Arial';
+        context.fillText(`X: ${scoreboard.X}`, 20, 80);
+        context.fillStyle = CIRCLE_COLOR;
+        context.fillText(`O: ${scoreboard.O}`, SCREEN_WIDTH - 150, 80);
+    };
+
+    const handleClick = (event) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+        const clickedRow = Math.floor(mouseY / SQUARE_SIZE);
+        const clickedCol = Math.floor(mouseX / SQUARE_SIZE);
+        const mainRow = Math.floor(clickedRow / 3);
+        const subRow = clickedRow % 3;
+        const mainCol = Math.floor(clickedCol / 3);
+        const subCol = clickedCol % 3;
+
+        if (targetBoard && (mainRow !== targetBoard[0] || mainCol !== targetBoard[1])) {
+            return;
+        }
+        if (board[mainRow][mainCol][subRow][subCol] === null) {
+            const newBoard = [...board];
+            newBoard[mainRow][mainCol][subRow][subCol] = currentPlayer;
+            setBoard(newBoard);
+
+            if (checkWinner(newBoard[mainRow][mainCol], currentPlayer)) {
+                const newMainBoard = [...mainBoard];
+                newMainBoard[mainRow][mainCol] = currentPlayer;
+                setMainBoard(newMainBoard);
+            }
+
+            if (isBoardFull(newBoard[mainRow][mainCol]) && mainBoard[mainRow][mainCol] === " ") {
+                const newMainBoard = [...mainBoard];
+                newMainBoard[mainRow][mainCol] = "D";
+                setMainBoard(newMainBoard);
+            }
+
+            if (checkWinner(mainBoard, currentPlayer)) {
+                setScoreboard(prev => ({ ...prev, [currentPlayer]: prev[currentPlayer] + 1 }));
+                resetGame(canvasRef.current.getContext('2d'));
+                return;
+            }
+
+            if (allBoardsFull(mainBoard)) {
+                console.log("The game is a draw!");
+                resetGame(canvasRef.current.getContext('2d'));
+                return;
+            }
+
+            setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+            setTargetBoard(mainBoard[subRow][subCol] === " " ? [subRow, subCol] : null);
+            const context = canvasRef.current.getContext('2d');
+            context.fillStyle = BG_COLOR;
+            context.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            drawLines(context);
+            drawFigures(context);
+            drawScoreboard(context);
+        }
+    };
+
+    const checkWinner = (board, player) => {
+        for (let row of board) {
+            if (row.every(spot => spot === player)) return true;
+        }
+        for (let col = 0; col < 3; col++) {
+            if (board.every(row => row[col] === player)) return true;
+        }
+        if (board.every((row, i) => row[i] === player)) return true;
+        if (board.every((row, i) => row[2 - i] === player)) return true;
+        return false;
+    };
+
+    const isBoardFull = (board) => {
+        return board.flat().every(spot => spot !== null);
+    };
+
+    const allBoardsFull = (mainBoard) => {
+        return mainBoard.flat().every(cell => ['X', 'O', 'D'].includes(cell));
+    };
+
+    return (
+        <canvas
+            ref={canvasRef}
+            width={SCREEN_WIDTH}
+            height={SCREEN_HEIGHT}
+            onClick={handleClick}
+        />
+    );
+};
+
+export default UltimateTicTacToe;
