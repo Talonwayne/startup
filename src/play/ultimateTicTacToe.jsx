@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BigBoard from './BigBoard';
 
-export function UltimateTicTacToe = () => {
+export function UltimateTicTacToe(){
   const [bigBoardState, setBigBoardState] = useState(Array(9).fill(null)); // Winner of each small board
   const [currentPlayer, setCurrentPlayer] = useState('X'); // Current player
   const [activeSmallBoard, setActiveSmallBoard] = useState(null); // Active board to play in
@@ -19,7 +19,6 @@ export function UltimateTicTacToe = () => {
 
   return (
     <div>
-      <h1>Ultimate Tic Tac Toe</h1>
       <BigBoard
         bigBoardState={bigBoardState}
         currentPlayer={currentPlayer}
