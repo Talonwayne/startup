@@ -1,5 +1,8 @@
 # Ultimate Tic Tac Toe
 
+## Startup Service
+I added the ultimate tictactoe to play. then I added the api based on simon to get a generik service out. that can be found in index.js. then I updated the about page, added the quote api from 260.click. scores and login call the service endpoints. Service endpoints are there in index.js. 
+
 ## Startup React
 I modeled my project after the tic tac toe, Updated all of the css, and converted my old code to react. I fixed the Login screen to be able to store login data later on. I got React to work and have the simon game as a placeholder for the play tab. I used react hooks throughout the project and used the react router in the app.jsx file. 
 
