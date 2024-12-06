@@ -89,8 +89,8 @@ function updateScores(newScore, scores) {
     scores.push(newScore);
   }
 
-  if (scores.length > 10) {
-    scores.length = 10;
+  if (scores.length > 5) {
+    scores.length = 5;
   }
 
   return scores;
