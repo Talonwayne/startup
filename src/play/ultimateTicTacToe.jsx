@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ultimateTicTacToe.css';
+import './UltimateTicTacToe.css';
 
 function SmallBoard({ board, onMove, isActive, winner }) {
   const handleCellClick = (row, col) => {
@@ -33,20 +33,23 @@ function SmallBoard({ board, onMove, isActive, winner }) {
   );
 }
 
-
-export function UltimateTicTacToe() {
-  const [boards, setBoards] = useState(Array(9).fill().map(() => ({
-    cells: Array(3).fill(null).map(() => Array(3).fill(null)),
-    winner: null,
-  })));
+export function UltimateTicTacToe({ onGameEnd }) {
+  const [boards, setBoards] = useState(
+    Array(9).fill().map(() => ({
+      cells: Array(3).fill(null).map(() => Array(3).fill(null)),
+      winner: null,
+    }))
+  );
   const [nextPlayer, setNextPlayer] = useState('x');
   const [targetBoard, setTargetBoard] = useState(null);
+  const [gameOver, setGameOver] = useState(null);
 
   const handleMove = (boardIndex, row, col) => {
+    if (gameOver) return;
+
     const newBoards = boards.map((board, index) => {
       if (index !== boardIndex) return board;
 
-      // Update the board state
       const newCells = board.cells.map((r, i) =>
         r.map((cell, j) => (i === row && j === col ? nextPlayer : cell))
       );
@@ -54,43 +57,68 @@ export function UltimateTicTacToe() {
       return {
         ...board,
         cells: newCells,
-        winner: calculateWinner(newCells) || (newCells.flat().every(cell => cell) ? 'N' : null),
+        winner: calculateWinner(newCells) || (newCells.flat().every((cell) => cell) ? 'N' : null),
       };
     });
+
+    const largeBoardWinner = calculateLargeBoardWinner(newBoards);
+
+    if (largeBoardWinner) {
+      const result = `Player ${largeBoardWinner.toUpperCase()} wins the game!`;
+      setGameOver(result);
+      if (onGameEnd) onGameEnd(result);
+      return;
+    }
+
+    const isLargeBoardTie = newBoards.every((board) => board.winner);
+    if (isLargeBoardTie) {
+      const result = 'The game is a tie!';
+      setGameOver(result);
+      if (onGameEnd) onGameEnd(result);
+      return;
+    }
 
     setBoards(newBoards);
     setNextPlayer(nextPlayer === 'x' ? 'o' : 'x');
 
-    // Set the next target board
     const nextBoardIndex = row * 3 + col;
     const targetIsUnavailable =
-      newBoards[nextBoardIndex]?.winner || newBoards[nextBoardIndex]?.cells.flat().every(cell => cell);
+      newBoards[nextBoardIndex]?.winner || newBoards[nextBoardIndex]?.cells.flat().every((cell) => cell);
 
     setTargetBoard(targetIsUnavailable ? null : nextBoardIndex);
   };
 
   const calculateWinner = (cells) => {
     const lines = [
-      // Rows
       [0, 1, 2],
       [3, 4, 5],
       [6, 7, 8],
-      // Columns
       [0, 3, 6],
       [1, 4, 7],
       [2, 5, 8],
-      // Diagonals
       [0, 4, 8],
       [2, 4, 6],
     ];
     for (let [a, b, c] of lines) {
-      if (cells[Math.floor(a / 3)][a % 3] &&
-          cells[Math.floor(a / 3)][a % 3] === cells[Math.floor(b / 3)][b % 3] &&
-          cells[Math.floor(a / 3)][a % 3] === cells[Math.floor(c / 3)][c % 3]) {
+      if (
+        cells[Math.floor(a / 3)][a % 3] &&
+        cells[Math.floor(a / 3)][a % 3] === cells[Math.floor(b / 3)][b % 3] &&
+        cells[Math.floor(a / 3)][a % 3] === cells[Math.floor(c / 3)][c % 3]
+      ) {
         return cells[Math.floor(a / 3)][a % 3];
       }
     }
     return null;
+  };
+
+  const calculateLargeBoardWinner = (boards) => {
+    const winners = boards.map((board) => board.winner || null);
+    const largeBoard = [
+      winners.slice(0, 3),
+      winners.slice(3, 6),
+      winners.slice(6, 9),
+    ];
+    return calculateWinner(largeBoard);
   };
 
   return (
@@ -100,7 +128,7 @@ export function UltimateTicTacToe() {
           key={index}
           board={board.cells}
           winner={board.winner}
-          isActive={targetBoard === null || targetBoard === index}
+          isActive={!gameOver && (targetBoard === null || targetBoard === index)}
           onMove={(row, col) => handleMove(index, row, col)}
         />
       ))}

@@ -1,31 +1,28 @@
-/* Base styles for the small board and the cells */
-.small-board {
+.ultimate-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    gap: 2px;
-    border: 2px solid #333;
-    width: 150px; /* Adjust this for desired board size */
-    height: 150px; /* Ensures square board */
+    gap: 10px;
+    width: 500px;
+    height: 500px;
+    margin: 0 auto;
   }
   
-  .small-board.active {
-    border-color: #007bff; /* Highlight active board */
-  }
-
   .small-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 2px;
     border: 2px solid #333;
-    width: 150px; /* Adjust for small board size */
-    height: 150px; /* Ensures square board */
     position: relative;
   }
   
+  .small-board.active {
+    border-color: #007bff;
+  }
+  
   .small-board.winner {
-    background-color: rgba(0, 255, 0, 0.1); /* Light green overlay for winner board */
+    background-color: rgba(0, 255, 0, 0.1);
   }
   
   .board-winner {
@@ -37,33 +34,23 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 3rem; /* Large display for X, O, or N */
+    font-size: 2rem;
     font-weight: bold;
-    color: #333; /* Dark text color */
-    background-color: rgba(255, 255, 255, 0.8); /* Slight overlay for visibility */
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.8);
     z-index: 1;
-    border-radius: 4px;
   }
-  
   
   .cell {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
-    font-size: 1.5rem; /* Adjust size of X and O */
+    font-size: 1.5rem;
     font-weight: bold;
     text-transform: uppercase;
     background-color: #f8f9fa;
     cursor: pointer;
-    color: #212529;
     border: 1px solid #ddd;
-    transition: background-color 0.2s ease;
-  }
-  
-  .cell:hover {
-    background-color: #e9ecef;
   }
   
   .cell.taken {
@@ -79,18 +66,16 @@
     color: blue;
   }
   
-  /* Styles for the ultimate board */
-  .ultimate-board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 10px;
-    width: 500px; /* Adjust for the overall board size */
-    height: 500px; /* Ensures square board */
-    margin: 0 auto;
-  }
-  
-  .ultimate-board .winner {
-    background-color: rgba(0, 255, 0, 0.2);
+  .game-winner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 2rem;
+    font-weight: bold;
+    color: green;
+    background-color: rgba(0, 0, 0, 0.8);
+    text-align: center;
   }
   
