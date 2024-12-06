@@ -9,8 +9,13 @@ export function About(props) {
   // We only want this to render the first time the component is created and so we provide an empty dependency list.
   React.useEffect(() => {
     setImageUrl(`Sketch.png`);
-    setQuote('Show me the code');
-    setQuoteAuthor('Linus Torvalds');
+    fetch('https://quote.cs260.click')
+      .then((response) => response.json())
+      .then((data) => {
+        setQuote(data.quote);
+        setQuoteAuthor(data.author);
+      })
+      .catch();
   }, []);
 
   return (
@@ -43,6 +48,11 @@ export function About(props) {
             Ricky Rhyme Time Show
             </p>
           <p className='author'>Richard Lamoureux</p>
+
+          <div className='quote-box bg-light text-dark'>
+            <p className='quote'>{quote}</p>
+            <p className='author'>{quoteAuthor}</p>
+          </div>
         </div>
       </div>
     </main>
