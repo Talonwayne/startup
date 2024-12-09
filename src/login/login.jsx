@@ -1,17 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Unauthenticated } from './unauthenticated';
-import { Authenticated } from './authenticated';
 import { AuthState } from './authState';
 
 import './login.css';
 
 export function Login({ userName, authState, onAuthChange }) {
   const navigate = useNavigate();
+  const [password, setPassword] = useState('');
+  const [displayError, setDisplayError] = useState(null);
 
   const handlePlayClick = () => {
     navigate('/play');
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userName, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('userName', userName);
+        onAuthChange(userName, AuthState.Authenticated);
+      } else {
+        const errorData = await response.json();
+        setDisplayError(`⚠ Error: ${errorData.msg}`);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setDisplayError('An error occurred during login.');
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/auth/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: userName, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('Registration successful!');
+      } else {
+        const errorData = await response.json();
+        setDisplayError(`⚠ Error: ${errorData.msg}`);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      setDisplayError('An error occurred during registration.');
+    }
   };
 
   return (
@@ -29,21 +79,19 @@ export function Login({ userName, authState, onAuthChange }) {
           <div className="card mt-4">
             <div className="card-body">
               <h2 className="card-title">Login</h2>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                // Handle login logic here
-                onAuthChange(userName, AuthState.Authenticated);
-              }}>
+              <form onSubmit={handleLogin}>
                 <div className="mb-3">
                   <label htmlFor="username" className="form-label">Username:</label>
-                  <input type="text" className="form-control" id="username" name="username" required />
+                  <input type="text" className="form-control" id="username" name="username" value={userName} readOnly required />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">Password:</label>
-                  <input type="password" className="form-control" id="password" name="password" required />
+                  <input type="password" className="form-control" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 <button type="submit" className="btn btn-primary">Login</button>
+                <button type="button" className="btn btn-secondary ms-2" onClick={handleRegister}>Register</button>
               </form>
+              {displayError && <div className="alert alert-danger mt-3">{displayError}</div>}
             </div>
           </div>
         )}

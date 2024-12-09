@@ -42,7 +42,7 @@ apiRouter.post('/auth/login', async (req, res) => {
       return;
     }
   }
-  res.status(401).send({ msg: 'Unauthorized' });
+  res.status(401).send({ msg: 'Wrong Password' });
 });
 
 // DeleteAuth logout a user
