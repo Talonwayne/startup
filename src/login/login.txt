@@ -1,0 +1,134 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+
+// AuthState class
+export class AuthState {
+  static Unknown = new AuthState('unknown');
+  static Authenticated = new AuthState('authenticated');
+  static Unauthenticated = new AuthState('unauthenticated');
+
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+// MessageDialog component
+export function MessageDialog(props) {
+  return (
+    <Modal {...props} show={props.message} centered>
+      <Modal.Body>{props.message}</Modal.Body>
+      <Modal.Footer>
+        <Button onClick={props.onHide}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
+
+// Authenticated component
+export function Authenticated(props) {
+  const navigate = useNavigate();
+
+  function logout() {
+    fetch(`/api/auth/logout`, {
+      method: 'delete',
+    })
+      .catch(() => {
+        // Logout failed. Assuming offline
+      })
+      .finally(() => {
+        localStorage.removeItem('userName');
+        props.onLogout();
+      });
+  }
+
+  return (
+    <div>
+      <div className='playerName'>{props.userName}</div>
+      <Button variant='primary' onClick={() => navigate('/play')}>
+        Play
+      </Button>
+      <Button variant='secondary' onClick={() => logout()}>
+        Logout
+      </Button>
+    </div>
+  );
+}
+
+// Unauthenticated component
+export function Unauthenticated(props) {
+  const [userName, setUserName] = React.useState(props.userName);
+  const [password, setPassword] = React.useState('');
+  const [displayError, setDisplayError] = React.useState(null);
+
+  async function loginUser() {
+    loginOrCreate(`/api/auth/login`);
+  }
+
+  async function createUser() {
+    loginOrCreate(`/api/auth/create`);
+  }
+
+  async function loginOrCreate(endpoint) {
+    const response = await fetch(endpoint, {
+      method: 'post',
+      body: JSON.stringify({ email: userName, password: password }),
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    });
+    if (response?.status === 200) {
+      localStorage.setItem('userName', userName);
+      props.onLogin(userName);
+    } else {
+      const body = await response.json();
+      setDisplayError(`⚠ Error: ${body.msg}`);
+    }
+  }
+
+  return (
+    <>
+      <div>
+        <div className='input-group mb-3'>
+          <span className='input-group-text'></span>
+          <input className='form-control' type='text' value={userName} onChange={(e) => setUserName(e.target.value)} placeholder='username' />
+        </div>
+        <div className='input-group mb-3'>
+          <span className='input-group-text'></span>
+          <input className='form-control' type='password' onChange={(e) => setPassword(e.target.value)} placeholder='password' />
+        </div>
+        <Button variant='primary' onClick={() => loginUser()} disabled={!userName || !password}>
+          Login
+        </Button>
+        <Button variant='secondary' onClick={() => createUser()} disabled={!userName || !password}>
+          Create
+        </Button>
+      </div>
+
+      <MessageDialog message={displayError} onHide={() => setDisplayError(null)} />
+    </>
+  );
+}
+
+// Login component
+export function Login({ userName, authState, onAuthChange }) {
+  return (
+    <main className='container-fluid bg-secondary text-center'>
+      <div>
+        {authState !== AuthState.Unknown && <h1>Login to Play</h1>}
+        {authState === AuthState.Authenticated && (
+          <Authenticated userName={userName} onLogout={() => onAuthChange(userName, AuthState.Unauthenticated)} />
+        )}
+        {authState === AuthState.Unauthenticated && (
+          <Unauthenticated
+            userName={userName}
+            onLogin={(loginUserName) => {
+              onAuthChange(loginUserName, AuthState.Authenticated);
+            }}
+          />
+        )}
+      </div>
+    </main>
+  );
+}
