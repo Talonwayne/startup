@@ -1,5 +1,8 @@
 # Ultimate Tic Tac Toe
 
+## Starup Database
+I added the mongodb and made it functional. 
+
 ## Startup Service
 I added the ultimate tictactoe to play. then I added the api based on simon to get a generik service out. that can be found in index.js. then I updated the about page, added the quote api from 260.click. scores and login call the service endpoints. Service endpoints are there in index.js. 
 
