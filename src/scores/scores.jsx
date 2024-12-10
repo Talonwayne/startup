@@ -5,8 +5,6 @@ import './scores.css';
 export function Scores() {
   const [scores, setScores] = React.useState([]);
 
-  // Demonstrates calling a service asynchronously so that
-  // React can properly update state objects with the results.
   React.useEffect(() => {
     fetch('/api/scores')
       .then((response) => response.json())
@@ -15,7 +13,6 @@ export function Scores() {
       });
   }, []);
 
-  // Demonstrates rendering an array with React
   const scoreRows = [];
   if (scores.length) {
     for (const [i, score] of scores.entries()) {
@@ -41,7 +38,7 @@ export function Scores() {
 
       <div className="container">
         <h1>High Scores</h1>
-        <p className="text-center mb-4">Placeholder for database (will add later)</p>
+        <p className="text-center mb-4">Highest Elo</p>
         <ol className="score-list">
           <li className="score-item">1st Place</li>
           <li className="score-item">2nd Place</li>
