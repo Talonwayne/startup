@@ -5,7 +5,6 @@ const app = express();
 const DB = require('./database.js');
 const { peerProxy } = require('./peerProxy.js');
 
-const authCookieName = 'token';
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
 app.use(express.json());
@@ -78,8 +77,20 @@ secureApiRouter.get('/games', async (req, res) => {
 
 // Create a new game
 secureApiRouter.post('/games', async (req, res) => {
-  const authToken = req.cookies[authCookieName];
+  const authToken = req.cookies['token'];
+
+  // Check if the token is present
+  if (!authToken) {
+    return res.status(401).send({ msg: 'Unauthorized: No token provided' });
+  }
+
   const user = await DB.getUserByToken(authToken);
+
+  // Check if the user exists
+  if (!user) {
+    return res.status(401).send({ msg: 'Unauthorized: Invalid token' });
+  }
+
   try {
     const newGame = await DB.createGame(user.username);
     res.send(newGame);
@@ -119,7 +130,7 @@ app.use((_req, res) => {
 });
 
 function setAuthCookie(res, authToken) {
-  res.cookie(authCookieName, authToken, {
+  res.cookie('token', authToken, {
     secure: true,
     httpOnly: true,
     sameSite: 'strict',
