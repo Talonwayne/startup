@@ -57,6 +57,12 @@ export function Play(props) {
     });
   };
 
+  const handleMove = (row, col) => {
+    if (selectedGame) {
+      ws.send(JSON.stringify({ type: 'move', gameId: selectedGame, player: props.userName, row, col }));
+    }
+  };
+
   return (
     <main className="bg-secondary" style={{ marginTop: '20px', padding: '20px' }}>
       {!selectedGame ? (
@@ -84,7 +90,7 @@ export function Play(props) {
       ) : (
         <>
           <h1>{selectedGame}</h1>
-          <UltimateTicTacToe onGameEnd={handleGameEnd} ws={ws} />
+          <UltimateTicTacToe onGameEnd={handleGameEnd} ws={ws} onMove={handleMove} />
         </>
       )}
     </main>

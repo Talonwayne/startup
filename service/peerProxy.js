@@ -1,5 +1,6 @@
 const { WebSocketServer } = require('ws');
 const uuid = require('uuid');
+const DB = require('./database.js'); // Import the database module
 
 function peerProxy(httpServer) {
   const wss = new WebSocketServer({ noServer: true });
@@ -16,17 +17,26 @@ function peerProxy(httpServer) {
     const connection = { id: uuid.v4(), alive: true, ws: ws };
     connections.push(connection);
 
-    ws.on('message', (data) => {
+    ws.on('message', async (data) => {
       const message = JSON.parse(data);
-      connections.forEach((c) => {
-        if (c.id !== connection.id) {
-          c.ws.send(data);
-        }
-      });
-    });
-
-    ws.on('gameEnd', async (winner, loser) => {
-      await updateElo(winner, loser);
+      if (message.type === 'move') {
+        // Handle player move
+        const { gameId, player, row, col } = message;
+        const updatedGame = await DB.makeMove(gameId, player, row, col); // Implement this function
+        // Broadcast the updated game state to all players
+        connections.forEach((c) => {
+          if (c.ws !== ws) {
+            c.ws.send(JSON.stringify({ type: 'update', game: updatedGame }));
+          }
+        });
+      } else if (message.type === 'gameEnd') {
+        const { winner, loser } = message;
+        await DB.updateElos(false, winner, loser); // Update Elo ratings
+        // Notify players about the game end
+        connections.forEach((c) => {
+          c.ws.send(JSON.stringify({ type: 'gameEnd', winner, loser }));
+        });
+      }
     });
 
     ws.on('close', () => {
