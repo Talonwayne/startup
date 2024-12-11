@@ -70,6 +70,33 @@ secureApiRouter.post('/score', async (req, res) => {
   res.send(scores);
 });
 
+// Fetch available games
+secureApiRouter.get('/games', async (req, res) => {
+  const games = await DB.getAvailableGames(); // Implement this function in your database module
+  res.send(games);
+});
+
+// Create a new game
+secureApiRouter.post('/games', async (req, res) => {
+  const { player1 } = req.body; // Assuming player1 is the user creating the game
+  const newGame = await DB.createGame(player1); // Implement this function
+  res.send(newGame);
+});
+
+// Join a game
+secureApiRouter.post('/games/join', async (req, res) => {
+  const { gameId, player2 } = req.body; // Assuming player2 is the user joining
+  const updatedGame = await DB.joinGame(gameId, player2); // Implement this function
+  res.send(updatedGame);
+});
+
+// Update Elo ratings
+secureApiRouter.post('/games/updateElo', async (req, res) => {
+  const { winner, loser } = req.body; // Assuming winner and loser are usernames
+  const result = await DB.updateElos(false, winner, loser); // Implement this function
+  res.send(result);
+});
+
 app.use(function (err, req, res, next) {
   res.status(500).send({ type: err.name, message: err.message });
 });

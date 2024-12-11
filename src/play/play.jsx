@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { UltimateTicTacToe } from './UltimateTicTacToe';
+import { GameNotifier } from './gameNotifier';
 
 export function Play(props) {
   const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [gameResult, setGameResult] = useState(null);
+  const ws = new WebSocket('ws://localhost:4000/ws'); // Adjust the URL as needed
 
   useEffect(() => {
     async function fetchGames() {
@@ -20,15 +22,39 @@ export function Play(props) {
     fetchGames();
   }, []);
 
-  const handleGameEnd = (result) => {
-    setGameResult(result);
-    setSelectedGame(null);
+  const handleCreateGame = async () => {
+    const newGame = { player1: props.userName };
+    const response = await fetch('/api/games', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newGame),
+    });
+    const game = await response.json();
+    setGames([...games, game]);
+    setSelectedGame(game.id);
   };
 
-  const handleCreateGame = () => {
-    const newGame = { name: `Game ${games.length + 1}` };
-    setGames([...games, newGame]);
-    setSelectedGame(newGame.name);
+  const handleJoinGame = async (gameId) => {
+    const response = await fetch('/api/games/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameId, player2: props.userName }),
+    });
+    const updatedGame = await response.json();
+    setSelectedGame(updatedGame.id);
+  };
+
+  const handleGameEnd = async (result) => {
+    setGameResult(result);
+    setSelectedGame(null);
+    // Update Elo ratings
+    const winner = result.winner; // Assuming result contains winner info
+    const loser = result.loser; // Assuming result contains loser info
+    await fetch('/api/games/updateElo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ winner, loser }),
+    });
   };
 
   return (
@@ -46,13 +72,10 @@ export function Play(props) {
             Create New Game
           </button>
           <ul className="game-list">
-            {games.map((game, index) => (
-              <li key={index}>
-                <button
-                  onClick={() => setSelectedGame(game.name)}
-                  className="game-button"
-                >
-                  Play {game.name}
+            {games.map((game) => (
+              <li key={game.id}>
+                <button onClick={() => handleJoinGame(game.id)} className="game-button">
+                  Join {game.name}
                 </button>
               </li>
             ))}
@@ -61,7 +84,7 @@ export function Play(props) {
       ) : (
         <>
           <h1>{selectedGame}</h1>
-          <UltimateTicTacToe onGameEnd={handleGameEnd} />
+          <UltimateTicTacToe onGameEnd={handleGameEnd} ws={ws} />
         </>
       )}
     </main>

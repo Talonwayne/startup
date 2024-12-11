@@ -16,12 +16,17 @@ function peerProxy(httpServer) {
     const connection = { id: uuid.v4(), alive: true, ws: ws };
     connections.push(connection);
 
-    ws.on('message', function message(data) {
+    ws.on('message', (data) => {
+      const message = JSON.parse(data);
       connections.forEach((c) => {
         if (c.id !== connection.id) {
           c.ws.send(data);
         }
       });
+    });
+
+    ws.on('gameEnd', async (winner, loser) => {
+      await updateElo(winner, loser);
     });
 
     ws.on('close', () => {
