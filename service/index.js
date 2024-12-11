@@ -72,22 +72,35 @@ secureApiRouter.post('/score', async (req, res) => {
 
 // Fetch available games
 secureApiRouter.get('/games', async (req, res) => {
-  const games = await DB.getAvailableGames(); // Implement this function in your database module
+  const games = await DB.getAvailableGames(); 
   res.send(games);
 });
 
 // Create a new game
 secureApiRouter.post('/games', async (req, res) => {
-  const { player1 } = req.body; // Assuming player1 is the user creating the game
-  const newGame = await DB.createGame(player1); // Implement this function
-  res.send(newGame);
+  const authToken = req.cookies[authCookieName];
+  const user = await DB.getUserByToken(authToken);
+  try {
+    const newGame = await DB.createGame(user.username);
+    res.send(newGame);
+  } catch (error) {
+    console.error('Error creating game in database:', error);
+    res.status(500).send({ msg: 'Failed to create game' });
+  }
 });
 
 // Join a game
 secureApiRouter.post('/games/join', async (req, res) => {
-  const { gameId, player2 } = req.body; // Assuming player2 is the user joining
-  const updatedGame = await DB.joinGame(gameId, player2); // Implement this function
-  res.send(updatedGame);
+  const authToken = req.cookies[authCookieName];
+  const user = await DB.getUserByToken(authToken);
+  const { gameId } = req.body;
+  try {
+    const updatedGame = await DB.joinGame(gameId, user.username);
+    res.send(updatedGame);
+  } catch (error) {
+    console.error('Error joining game in database:', error);
+    res.status(500).send({ msg: 'Failed to join game' });
+  }
 });
 
 // Update Elo ratings

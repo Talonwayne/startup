@@ -24,24 +24,49 @@ export function Play(props) {
 
   const handleCreateGame = async () => {
     const newGame = { player1: props.userName };
-    const response = await fetch('/api/games', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newGame),
-    });
-    const game = await response.json();
-    setGames([...games, game]);
-    setSelectedGame(game.id);
+    try {
+      const response = await fetch('/api/games', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newGame),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json();
+        console.error('Error creating game:', errorBody);
+        throw new Error(`Error: ${errorBody.msg || 'Failed to create game'}`);
+      }
+
+      const game = await response.json();
+      setGames([...games, game]);
+      setSelectedGame(game.id);
+      ws.send(JSON.stringify({ type: 'newGame', gameId: game.id, player: props.userName }));
+    } catch (error) {
+      console.error('Failed to create game:', error.message);
+    }
   };
 
   const handleJoinGame = async (gameId) => {
-    const response = await fetch('/api/games/join', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gameId, player2: props.userName }),
-    });
-    const updatedGame = await response.json();
-    setSelectedGame(updatedGame.id);
+    const player2 = props.userName;
+    try {
+      const response = await fetch('/api/games/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameId, player2 }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json();
+        console.error('Error joining game:', errorBody);
+        throw new Error(`Error: ${errorBody.msg || 'Failed to join game'}`);
+      }
+
+      const updatedGame = await response.json();
+      setSelectedGame(updatedGame.id);
+    } catch (error) {
+      console.error('Failed to join game:', error.message);
+      // Optionally, you can set an error state to display to the user
+    }
   };
 
   const handleGameEnd = async (result) => {
