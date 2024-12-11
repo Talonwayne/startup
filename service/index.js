@@ -6,7 +6,7 @@ const DB = require('./database.js');
 const { peerProxy } = require('./peerProxy.js');
 
 const authCookieName = 'token';
-const port = process.argv.length > 2 ? process.argv[2] : 3000;
+const port = process.argv.length > 2 ? process.argv[2] : 4000;
 
 app.use(express.json());
 app.use(cookieParser());
@@ -17,10 +17,10 @@ const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 apiRouter.post('/auth/create', async (req, res) => {
-  if (await DB.getUser(req.body.email)) {
+  if (await DB.getUser(req.body.username)) {
     res.status(409).send({ msg: 'Existing user' });
   } else {
-    const user = await DB.createUser(req.body.email, req.body.password);
+    const user = await DB.createUser(req.body.username, req.body.password, 400);
     setAuthCookie(res, user.token);
     res.send({
       id: user._id,
@@ -29,7 +29,7 @@ apiRouter.post('/auth/create', async (req, res) => {
 });
 
 apiRouter.post('/auth/login', async (req, res) => {
-  const user = await DB.getUser(req.body.email);
+  const user = await DB.getUser(req.body.username);
   if (user) {
     if (await bcrypt.compare(req.body.password, user.password)) {
       setAuthCookie(res, user.token);
@@ -59,7 +59,7 @@ secureApiRouter.use(async (req, res, next) => {
 });
 
 secureApiRouter.get('/scores', async (req, res) => {
-  const scores = await DB.getHighScores();
+  const scores = await DB.getBestElos();
   res.send(scores);
 });
 
