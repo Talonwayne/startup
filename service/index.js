@@ -77,24 +77,28 @@ secureApiRouter.get('/games', async (req, res) => {
 
 // Create a new game
 secureApiRouter.post('/games', async (req, res) => {
-  if (await DB.getGame(req.body.gameName)) {
-    res.status(409).send({ msg: 'That Name is Already Taken' });
-  }
+  const { gameName } = req.body;
   
-  const authToken = req.cookies['token'];
+  if (!gameName) {
+    return res.status(400).send({ msg: 'Game name is required' });
+  }
 
+  if (await DB.getGame(gameName)) {
+    return res.status(409).send({ msg: 'That Name is Already Taken' });
+  }
+
+  const authToken = req.cookies['token'];
   if (!authToken) {
     return res.status(401).send({ msg: 'Unauthorized: No token provided' });
   }
 
   const user = await DB.getUserByToken(authToken);
-
   if (!user) {
     return res.status(401).send({ msg: 'Unauthorized: Invalid token' });
   }
 
   try {
-    const newGame = await DB.createGame(user.username);
+    const newGame = await DB.createGame(gameName, user.username);
     res.send(newGame);
   } catch (error) {
     console.error('Error creating game in database:', error);
@@ -118,8 +122,8 @@ secureApiRouter.post('/games/join', async (req, res) => {
 
 // Update Elo ratings
 secureApiRouter.post('/games/updateElo', async (req, res) => {
-  const { winner, loser } = req.body; // Assuming winner and loser are usernames
-  const result = await DB.updateElos(false, winner, loser); // Implement this function
+  const { winner, loser } = req.body; 
+  const result = await DB.updateElos(false, winner, loser); 
   res.send(result);
 });
 

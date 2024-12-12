@@ -67,15 +67,96 @@
   }
   
   .game-winner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
-    font-size: 2rem;
-    font-weight: bold;
-    color: green;
-    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+  }
+  
+  .winner-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
     text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  
+  .winner-content h2 {
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .winner-content p {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+  
+  .winner-content button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .winner-content button:hover {
+    background-color: #0056b3;
+  }
+  
+  .ultimate-tic-tac-toe-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f0f0f064;
+  }
+  
+  .players-info, .next-player-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .players-info h3, .next-player-info h3 {
+    margin-right: 10px;
+    font-weight: bold;
+  }
+  
+  .player, .next-player {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: #000000;
+    font-weight: bold;
+  }
+  
+  .x-player {
+    background-color: #ff6b6b;
+  }
+  
+  .o-player {
+    background-color: #4ecdc4;
+  }
+  
+  .next-player.x {
+    color: #ff6b6b;
+    font-weight: bold;
+  }
+  
+  .next-player.o {
+    color: #4ecdc4;
+    font-weight: bold;
   }
   
