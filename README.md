@@ -1,7 +1,11 @@
 # Ultimate Tic Tac Toe
 
+
+## Startup websocket
+I created a WebSocket server that connects the frontend and backend, enabling real-time game data transmission. The WebSocket connection allows players to see live updates of game moves, player joins, and game state changes across all connected clients. The thing works!
+
 ## Starup Database
-I added the mongodb and made it functional. 
+I implemented user registration and login by storing credentials in MongoDB, with secure authentication checks. The application restricts functionality to logged-in users, ensuring that only authenticated users can access game features.
 
 ## Startup Service
 I added the ultimate tictactoe to play. then I added the api based on simon to get a generik service out. that can be found in index.js. then I updated the about page, added the quote api from 260.click. scores and login call the service endpoints. Service endpoints are there in index.js. 
