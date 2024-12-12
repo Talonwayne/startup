@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './UltimateTicTacToe.css';
-import { GameEvent, GameNotifier } from './gameNotifier';
 
 function SmallBoard({ board, onMove, isActive, winner }) {
   const handleCellClick = (row, col) => {
