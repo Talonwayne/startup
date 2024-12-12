@@ -77,6 +77,10 @@ secureApiRouter.get('/games', async (req, res) => {
 
 // Create a new game
 secureApiRouter.post('/games', async (req, res) => {
+  if (await DB.getGame(req.body.gameName)) {
+    res.status(409).send({ msg: 'That Name is Already Taken' });
+  }
+  
   const authToken = req.cookies['token'];
 
   if (!authToken) {

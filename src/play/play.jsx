@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { UltimateTicTacToe } from './UltimateTicTacToe';
-import { GameNotifier } from './gameNotifier';
 
 export function Play(props) {
   const [games, setGames] = useState([]);
+  const [gameName, setGameName] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [gameResult, setGameResult] = useState(null);
   const ws = new WebSocket('ws://localhost:4000/ws'); 
@@ -39,8 +39,8 @@ export function Play(props) {
 
       const game = await response.json();
       setGames([...games, game]);
-      setSelectedGame(game.id);
-      ws.send(JSON.stringify({ type: 'newGame', gameId: game.id, player: props.userName }));
+      setSelectedGame(gameName);
+      ws.send(JSON.stringify({ type: 'newGame', gameName: gameName, player: props.userName }));
     } catch (error) {
       console.error('Failed to create game:', error.message);
     }
@@ -48,6 +48,7 @@ export function Play(props) {
 
   const handleJoinGame = async (gameId) => {
     const player2 = props.userName;
+    setMyTeam('o');
     try {
       const response = await fetch('/api/games/join', {
         method: 'POST',
@@ -72,8 +73,8 @@ export function Play(props) {
     setGameResult(result);
     setSelectedGame(null);
     // Update Elo ratings
-    const winner = result.winner; // Assuming result contains winner info
-    const loser = result.loser; // Assuming result contains loser info
+    const winner = result.winner; 
+    const loser = result.loser;
     await fetch('/api/games/updateElo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -86,6 +87,7 @@ export function Play(props) {
       ws.send(JSON.stringify({ type: 'move', gameId: selectedGame, player: props.userName, row, col }));
     }
   };
+  const [myTeam, setMyTeam] = useState('x');
 
   return (
     <main className="bg-secondary" style={{ marginTop: '20px', padding: '20px' }}>
@@ -98,23 +100,31 @@ export function Play(props) {
               <p>{gameResult}</p>
             </div>
           )}
-          <button onClick={handleCreateGame} className="create-game-button">
-            Create New Game
-          </button>
           <ul className="game-list">
             {games.map((game) => (
               <li key={game.id}>
                 <button onClick={() => handleJoinGame(game.id)} className="game-button">
-                  Join {game.name}
+                  Join {}
                 </button>
               </li>
             ))}
           </ul>
+          <div className="create-game-section">
+        <input
+          type="text"
+          placeholder="Enter Game Name"
+          className="game-name-input"
+          onChange={(event) => setGameName(event.target.value)}
+        />
+        <button onClick={handleCreateGame} className="create-game-button">
+          Create New Game
+        </button>
+      </div>
         </>
       ) : (
         <>
           <h1>{selectedGame}</h1>
-          <UltimateTicTacToe onGameEnd={handleGameEnd} ws={ws} onMove={handleMove} />
+          <UltimateTicTacToe onGameEnd={handleGameEnd} ws={ws} onMove={handleMove} myTeam={myTeam}/>
         </>
       )}
     </main>

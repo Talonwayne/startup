@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './UltimateTicTacToe.css';
+import { GameEvent, GameNotifier } from './gameNotifier';
 
 function SmallBoard({ board, onMove, isActive, winner }) {
   const handleCellClick = (row, col) => {
@@ -33,7 +34,7 @@ function SmallBoard({ board, onMove, isActive, winner }) {
   );
 }
 
-export function UltimateTicTacToe({onGameEnd}) {
+export function UltimateTicTacToe({ onGameEnd, myTeam, ws }) {
   const [boards, setBoards] = useState(
     Array(9).fill().map(() => ({
       cells: Array(3).fill(null).map(() => Array(3).fill(null)),
@@ -44,8 +45,39 @@ export function UltimateTicTacToe({onGameEnd}) {
   const [targetBoard, setTargetBoard] = useState(null);
   const [gameOver, setGameOver] = useState(null);
 
+  useEffect(() => {
+    if (ws) {
+      ws.onmessage = (event) => {
+        const { boardIndex, row, col, nextPlayer } = JSON.parse(event.data);
+        handleMove(boardIndex, row, col, nextPlayer);
+      };
+    }
+
+    return () => {
+      if (ws) {
+        ws.close(); // Close the WebSocket connection if needed
+      }
+    };
+  }, [ws]);
+
+  useEffect(() => {
+    // Subscribe to game events
+    const handleGameEvent = (event) => {
+      if (event.type === GameEvent.Move) {
+        const { boardIndex, row, col, nextPlayer } = event.value;
+        handleMove(boardIndex, row, col, nextPlayer);
+      }
+    };
+
+    GameNotifier.addHandler(handleGameEvent); // Add the event handler
+
+    return () => {
+      GameNotifier.removeHandler(handleGameEvent); // Clean up on unmount
+    };
+  }, [boards, nextPlayer, gameOver]);
+
   const handleMove = (boardIndex, row, col, playerMove) => {
-    if (gameOver || playerMove !== nextPlayer) return;
+    if (gameOver || playerMove !== nextPlayer || playerMove !== myTeam) return;
 
     const newBoards = boards.map((board, index) => {
       if (index !== boardIndex) return board;
@@ -87,6 +119,10 @@ export function UltimateTicTacToe({onGameEnd}) {
 
     setTargetBoard(targetIsUnavailable ? null : nextBoardIndex);
 
+    // Send the move to the WebSocket server
+    if (ws) {
+      ws.send(JSON.stringify({ boardIndex, row, col, nextPlayer: nextPlayer === 'x' ? 'o' : 'x' }));
+    }
   };
 
   const calculateWinner = (cells) => {

@@ -21,6 +21,10 @@ function getUser(username) {
   return userCollection.findOne({ username: username });
 }
 
+function getGame(gameName) {
+  return gameCollection.findOne({ gameName: gameName });
+}
+
 function getUserByToken(token) {
   return userCollection.findOne({ token: token });
 }
@@ -39,6 +43,7 @@ async function createUser(username, password, elo) {
 
 async function createGame(player1) {
   const newGame = {
+    gameName: gameName,
     players: [player1],
     moves: [], 
     status: 'waiting', 
@@ -137,4 +142,5 @@ module.exports = {
   getAvailableGames,
   joinGame,
   makeMove,
+  getGame,
 };
