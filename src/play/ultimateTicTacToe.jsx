@@ -55,13 +55,12 @@ export function UltimateTicTacToe({ onGameEnd, myTeam, ws }) {
 
     return () => {
       if (ws) {
-        ws.close(); // Close the WebSocket connection if needed
+        ws.close();
       }
     };
   }, [ws]);
 
   useEffect(() => {
-    // Subscribe to game events
     const handleGameEvent = (event) => {
       if (event.type === GameEvent.Move) {
         const { boardIndex, row, col, nextPlayer } = event.value;
