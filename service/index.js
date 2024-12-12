@@ -40,7 +40,7 @@ apiRouter.post('/auth/login', async (req, res) => {
 });
 
 apiRouter.delete('/auth/logout', (_req, res) => {
-  res.clearCookie(authCookieName);
+  res.clearCookie('token');
   res.status(204).end();
 });
 
@@ -48,7 +48,7 @@ const secureApiRouter = express.Router();
 apiRouter.use(secureApiRouter);
 
 secureApiRouter.use(async (req, res, next) => {
-  const authToken = req.cookies[authCookieName];
+  const authToken = req.cookies['token'];
   const user = await DB.getUserByToken(authToken);
   if (user) {
     next();
@@ -79,14 +79,12 @@ secureApiRouter.get('/games', async (req, res) => {
 secureApiRouter.post('/games', async (req, res) => {
   const authToken = req.cookies['token'];
 
-  // Check if the token is present
   if (!authToken) {
     return res.status(401).send({ msg: 'Unauthorized: No token provided' });
   }
 
   const user = await DB.getUserByToken(authToken);
 
-  // Check if the user exists
   if (!user) {
     return res.status(401).send({ msg: 'Unauthorized: Invalid token' });
   }
@@ -102,7 +100,7 @@ secureApiRouter.post('/games', async (req, res) => {
 
 // Join a game
 secureApiRouter.post('/games/join', async (req, res) => {
-  const authToken = req.cookies[authCookieName];
+  const authToken = req.cookies['token'];
   const user = await DB.getUserByToken(authToken);
   const { gameId } = req.body;
   try {

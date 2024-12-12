@@ -22,7 +22,7 @@ function peerProxy(httpServer) {
       if (message.type === 'move') {
         // Handle player move
         const { gameId, player, row, col } = message;
-        const updatedGame = await DB.makeMove(gameId, player, row, col); // Implement this function
+        const updatedGame = await DB.makeMove(gameId, player, row, col);
         // Broadcast the updated game state to all players
         connections.forEach((c) => {
           if (c.ws !== ws) {

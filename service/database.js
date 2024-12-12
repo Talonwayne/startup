@@ -40,8 +40,8 @@ async function createUser(username, password, elo) {
 async function createGame(player1) {
   const newGame = {
     players: [player1],
-    moves: [], // Store moves made in the game
-    status: 'waiting', // Game status: waiting, active, finished
+    moves: [], 
+    status: 'waiting', 
     winner: null,
   };
   const result = await gameCollection.insertOne(newGame);
@@ -67,18 +67,15 @@ async function makeMove(gameId, player, row, col) {
     throw new Error('Game is not active or does not exist');
   }
 
-  // Update the moves array with the new move
   const move = { player, row, col };
   const updatedMoves = [...game.moves, move];
 
-  // Here you would also need to check for a winner and update the game status accordingly
-  // For simplicity, let's assume we just update the moves for now
   await gameCollection.updateOne(
     { _id: gameId },
     { $set: { moves: updatedMoves } }
   );
 
-  return { ...game, moves: updatedMoves }; // Return the updated game state
+  return { ...game, moves: updatedMoves }; 
 }
 
 async function updateGame(gameId, updatedGame) {

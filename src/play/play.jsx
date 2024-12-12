@@ -6,7 +6,7 @@ export function Play(props) {
   const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [gameResult, setGameResult] = useState(null);
-  const ws = new WebSocket('ws://localhost:4000/ws'); // Adjust the URL as needed
+  const ws = new WebSocket('ws://localhost:4000/ws'); 
 
   useEffect(() => {
     async function fetchGames() {
@@ -65,7 +65,6 @@ export function Play(props) {
       setSelectedGame(updatedGame.id);
     } catch (error) {
       console.error('Failed to join game:', error.message);
-      // Optionally, you can set an error state to display to the user
     }
   };
 
